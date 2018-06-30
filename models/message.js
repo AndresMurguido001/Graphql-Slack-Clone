@@ -1,7 +1,7 @@
 export default (sequelize, DataTypes) => {
     let Message = sequelize.define('message', {
         text: DataTypes.STRING     
-    }, { underscored: true });
+    });
 
     Message.associate = (models) => {
         //1:M

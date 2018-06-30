@@ -4,7 +4,7 @@ export default (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             public: DataTypes.BOOLEAN
         }
-    }, { underscored: true });
+    });
 
     Channel.associate = (models) => {
         //1:M
