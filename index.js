@@ -15,6 +15,9 @@ const typeDefs = mergeTypes(types, { all: true });
 const resolverFiles = fileLoader(path.join(__dirname, './resolvers'));
 const resolvers = mergeResolvers(resolverFiles, { all: true });
 
+const SECRET = "lksdlkajsdljasldkjasldj";
+const SECRET2 = "poiuyghjikmnbvfrtgcvfd";
+
 const schema = makeExecutableSchema({
     typeDefs,
     resolvers
@@ -32,6 +35,8 @@ app.use(graphqlEndPoint,
                             user: {
                                 id: 1
                             },
+                            SECRET,
+                            SECRET2
                         },
                     }));
 app.use('/graphiql',

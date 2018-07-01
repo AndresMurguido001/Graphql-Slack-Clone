@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import _ from "lodash";
+import { tryLoggingIn } from '../auth';
 
 const formatErrors = (e, models) => {
     if (e instanceof models.sequelize.ValidationError){
@@ -14,6 +15,7 @@ export default {
         allUsers: (parent, args, { models }) => models.User.findAll(), 
     },
     Mutation: {
+        login: (parent, { email, password}, { models, SECRET, SECRET2 }) => tryLoggingIn(email, password, models, SECRET, SECRET2),
         registerUser: async (parent, {...otherargs, password}, { models }) => {            
             const hashPass = await bcrypt.hash(password, 10);
             try {

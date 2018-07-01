@@ -1,0 +1,50 @@
+import jwt from "jsonwebtoken";
+import bcrypt from 'bcryptjs';
+import _ from "lodash";
+
+export const createTokens = (user, secret, secret2) => {
+    const createToken = jwt.sign(
+        {
+            user: _.pick(user, ["id"])
+        },
+        secret,
+        {
+            expiresIn: '1h'
+        }
+    )
+    const createRefreshToken = jwt.sign(
+        {
+            user: _.pick(user, ["id"])
+        },
+        secret2,
+        {
+            expiresIn: '1d'
+        }
+    )
+    return [ createToken, createRefreshToken ];
+}
+
+
+export const tryLoggingIn = async (email, password, models, SECRET, SECRET2 ) => {
+    const user = await models.User.findOne({ where: { email }, raw: true });
+    if (!user){
+        return {
+            ok: false,
+            errors: [{path: "email", message: "Invalid Email"}]
+        };
+    }
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword){
+        return {
+            ok: false,
+            errors: [{path: "password", message: "Invalid Password"}]
+        };
+    }
+    const refreshTokenSecret = user.password + SECRET2
+    const [ token, refreshToken ] = createTokens(user, SECRET, refreshTokenSecret);
+    return {
+        ok: true,
+        token,
+        refreshToken
+    };
+}
