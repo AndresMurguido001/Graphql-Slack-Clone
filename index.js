@@ -32,7 +32,8 @@ const addUser = async (req, res, next) => {
     if (token) {
         try {            
             const { user } = jwt.verify(token, SECRET);
-            req.user = user;                        
+            req.user = user; 
+            console.log(user)                                              
         } catch (err) {
             const refreshToken = req.headers['x-refresh-token'];
             const newTokens = await refreshTokens(token, refreshToken, models, SECRET, SECRET2);
@@ -41,7 +42,7 @@ const addUser = async (req, res, next) => {
                 res.set('x-token', newTokens.token);
                 res.set('x-refresh-token', newTokens.refreshToken);
             }
-        req.user = newTokens.user;
+        req.user = newTokens.user;    
         }
     }
     next();
@@ -50,7 +51,7 @@ app.use(addUser);
 const graphqlEndPoint = "/graphql";
 app.use(graphqlEndPoint,
         bodyParser.json(),
-        graphqlExpress(req => ({            
+        graphqlExpress(req => ({
                         schema,
                         context: {
                             models, 
@@ -58,7 +59,8 @@ app.use(graphqlEndPoint,
                             SECRET,
                             SECRET2
                         },
-                    })));                   
+                    }),
+));                   
 app.use('/graphiql',
         graphiqlExpress({
                 endpointURL: graphqlEndPoint 

@@ -2,7 +2,10 @@ export default (sequelize, DataTypes) => {
     let Channel = sequelize.define('channel', {
         name: {
             type: DataTypes.STRING,
-            public: DataTypes.BOOLEAN
+            public: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: true,
+            },
         }
     });
 

@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 
 var sequelize = new Sequelize("slack", "postgres", "postgres", {
     dialect: "postgres",
+    operatorsAliases: Sequelize.Op,    
     define: {
         underscored: true
     }
