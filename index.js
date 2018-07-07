@@ -32,8 +32,7 @@ const addUser = async (req, res, next) => {
     if (token) {
         try {            
             const { user } = jwt.verify(token, SECRET);
-            req.user = user; 
-            console.log(user)                                              
+            req.user = user;                                                          
         } catch (err) {
             const refreshToken = req.headers['x-refresh-token'];
             const newTokens = await refreshTokens(token, refreshToken, models, SECRET, SECRET2);
