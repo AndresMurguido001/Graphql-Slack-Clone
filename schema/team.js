@@ -14,6 +14,7 @@ export default `
 
     type Query {
         allTeams: [Team!]!
+        invitedToTeams: [Team!]!
     }
     type VoidResponse {
         ok: Boolean!
