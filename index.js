@@ -8,7 +8,10 @@ import cors from "cors";
 import jwt from 'jsonwebtoken';
 import { refreshTokens } from "./auth"
 import models from "./models";
-
+//Subscriptions setup
+import { createServer } from 'http';
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 //merge all files in schema directory to create typedefs
 const types = fileLoader(path.join(__dirname, './schema'));
 const typeDefs = mergeTypes(types, { all: true });
@@ -64,7 +67,17 @@ app.use('/graphiql',
         graphiqlExpress({
                 endpointURL: graphqlEndPoint 
             }));
+const server = createServer(app);
 
 models.sequelize.sync().then((x) => {
-    app.listen(8080);
-})
+    server.listen(8080, () => {
+        new SubscriptionServer({
+            execute,
+            subscribe,
+            schema,
+        }, {
+            server: server,
+            path: '/subscriptions',
+        });
+    });
+});
