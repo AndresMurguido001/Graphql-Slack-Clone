@@ -1,25 +1,25 @@
-import Sequelize from 'sequelize';
-
+import Sequelize from "sequelize";
 
 var sequelize = new Sequelize("slack", "postgres", "postgres", {
-    dialect: "postgres",
-    operatorsAliases: Sequelize.Op,    
-    define: {
-        underscored: true
-    }
+  dialect: "postgres",
+  operatorsAliases: Sequelize.Op,
+  define: {
+    underscored: true
+  }
 });
 const models = {
-    User: sequelize['import']('./user'),
-    Team: sequelize['import']('./team'),
-    Channel: sequelize['import']('./channel'),
-    Message: sequelize['import']('./message'),
-    Member: sequelize['import']('./member'),
+  User: sequelize["import"]("./user"),
+  Team: sequelize["import"]("./team"),
+  Channel: sequelize["import"]("./channel"),
+  Message: sequelize["import"]("./message"),
+  Member: sequelize["import"]("./member"),
+  DirectMessage: sequelize["import"]("./directMessage")
 };
 
 Object.keys(models).forEach(modelName => {
-    if (models[modelName].associate) {
+  if (models[modelName].associate) {
     models[modelName].associate(models);
-    }
+  }
 });
 
 models.sequelize = sequelize;

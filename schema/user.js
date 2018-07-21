@@ -17,7 +17,7 @@ export default `
         refreshToken: String
     }
     type Query {
-        getUser(id: Int!): User!
+        me: User!
         allUsers: [User!]!
     }
     type Mutation {
