@@ -19,9 +19,10 @@ export default `
     type Query {
         me: User!
         allUsers: [User!]!
+        getUser(userId: Int!): User
     }
     type Mutation {
         registerUser(username: String!, email: String!, password: String!): RegisterResponse!
         login(email: String!, password: String!): LoginResponse!
     }
-`
+`;

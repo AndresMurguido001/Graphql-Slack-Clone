@@ -32,3 +32,28 @@ export const requiresTeamAccess = createResolver(
     }
   }
 );
+
+export const directMessageSub = createResolver(
+  async (parent, { teamId, userId }, { user, models }) => {
+    if (!user || !user.id) {
+      throw new Error("You must be authenticated to continue");
+    }
+    // check if part of the team
+    const members = await models.Member.findAll({
+      where: {
+        teamId,
+        [models.sequelize.Op.or]: [
+          {
+            userId: user.id
+          },
+          {
+            userId
+          }
+        ]
+      }
+    });
+    if (members.length !== 2) {
+      throw new Error("Something went wrong!");
+    }
+  }
+);

@@ -1,6 +1,29 @@
-import { requiresAuth, requiresTeamAccess } from "../permissions";
+import {
+  requiresAuth,
+  requiresTeamAccess,
+  directMessageSub
+} from "../permissions";
+import { withFilter } from "graphql-subscriptions";
+import pubsub from "../pubsub";
+
+const NEW_DIRECT_MESSAGE = "NEW_DIRECT_MESSAGE";
 
 export default {
+  Subscription: {
+    newDirectMessage: {
+      subscribe: directMessageSub.createResolver(
+        withFilter(
+          () => pubsub.asyncIterator(NEW_DIRECT_MESSAGE),
+          (payload, args, { user }) =>
+            payload.teamId === args.teamId &&
+            ((payload.senderId === user.id &&
+              payload.receiverId === args.userId) ||
+              (payload.senderId === args.userId &&
+                payload.receiverId === user.id))
+        )
+      )
+    }
+  },
   DirectMessage: {
     sender: ({ sender, senderId }, args, { models }) => {
       if (sender) {
@@ -44,22 +67,18 @@ export default {
           ...args,
           senderId: user.id
         });
-        // const asyncFunc = async () => {
-        //   const currentUser = await models.User.findOne({
-        //     where: {
-        //       id: user.id
-        //     }
-        //   });
+        pubsub.publish(NEW_DIRECT_MESSAGE, {
+          teamId: args.teamId,
+          receiverId: args.receiverId,
+          senderId: user.id,
+          newDirectMessage: {
+            ...directMessage.dataValues,
+            sender: {
+              username: user.username
+            }
+          }
+        });
 
-        //   pubsub.publish(NEW_CHANNEL_MESSAGE, {
-        //     channelId: args.channelId,
-        //     newChannelMessage: {
-        //       ...message.dataValues,
-        //       user: currentUser.dataValues
-        //     }
-        //   });
-        // };
-        // asyncFunc();
         return true;
       } catch (error) {
         console.log(error);

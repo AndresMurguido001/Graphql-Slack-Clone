@@ -37,7 +37,7 @@ const addUser = async (req, res, next) => {
       const { user } = jwt.verify(token, SECRET);
       req.user = user;
     } catch (err) {
-      const refreshToken = req.headers["x-refresh-token"];
+      const refreshToken = req.headers["x-refreshToken"];
       console.log("TOKEN SHOULD REFRESH ITSELF", refreshToken);
       const newTokens = await refreshTokens(
         token,
@@ -47,9 +47,9 @@ const addUser = async (req, res, next) => {
         SECRET2
       );
       if (newTokens.token && newTokens.refreshToken) {
-        res.set("Access-Control-Expose-Headers", "x-token, x-refresh-token");
+        res.set("Access-Control-Expose-Headers", "x-token, x-refreshToken");
         res.set("x-token", newTokens.token);
-        res.set("x-refresh-token", newTokens.refreshToken);
+        res.set("x-refreshToken", newTokens.refreshToken);
       }
       req.user = newTokens.user;
     }

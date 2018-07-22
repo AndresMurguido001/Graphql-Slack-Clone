@@ -16,4 +16,4 @@ export default `
         createMessage(channelId: Int!, text: String!): Boolean!
     }
 
-`
+`;
