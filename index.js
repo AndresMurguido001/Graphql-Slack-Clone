@@ -38,6 +38,7 @@ const addUser = async (req, res, next) => {
       req.user = user;
     } catch (err) {
       const refreshToken = req.headers["x-refresh-token"];
+      console.log("TOKEN SHOULD REFRESH ITSELF", refreshToken);
       const newTokens = await refreshTokens(
         token,
         refreshToken,

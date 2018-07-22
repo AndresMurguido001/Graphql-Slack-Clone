@@ -4,6 +4,7 @@ export default `
         name: String!
         members: [User!]!
         channels: [Channel!]!
+        directMessageMembers: [User!]!
         admin: Boolean!
     }    
     type CreateTeamResponse {
@@ -15,6 +16,7 @@ export default `
     type Query {
         allTeams: [Team!]!
         invitedToTeams: [Team!]!
+        getTeamMembers(teamId: Int!): [User!]!
     }
     type VoidResponse {
         ok: Boolean!
@@ -24,4 +26,4 @@ export default `
         createTeam(name: String!): CreateTeamResponse!
         addTeamMember(email: String!, teamId: Int!): VoidResponse!
     }
-`
+`;
