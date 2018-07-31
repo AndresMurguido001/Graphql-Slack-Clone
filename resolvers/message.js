@@ -37,12 +37,20 @@ export default {
     )
   },
   Mutation: {
-    createMessage: async (parent, args, { models, user }) => {
+    createMessage: async (parent, { file, ...args }, { models, user }) => {
       try {
+        const messageData = args;
+        if (file) {
+          messageData.filetype = file.type;
+          messageData.url = file.path;
+        }
         const message = await models.Message.create({
-          ...args,
+          messageData,
+          url: messageData.url,
+          filetype: messageData.filetype,
           userId: user.id
         });
+        console.log("MESSAGEDATA", messageData);
         const asyncFunc = async () => {
           const currentUser = await models.User.findOne({
             where: {

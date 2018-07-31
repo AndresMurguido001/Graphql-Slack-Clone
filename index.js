@@ -8,10 +8,13 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import { refreshTokens } from "./auth";
 import models from "./models";
+import formidable from "formidable";
+
 //Subscriptions setup
 import { createServer } from "http";
 import { execute, subscribe } from "graphql";
 import { SubscriptionServer } from "subscriptions-transport-ws";
+
 //merge all files in schema directory to create typedefs
 const types = fileLoader(path.join(__dirname, "./schema"));
 const typeDefs = mergeTypes(types, { all: true });
@@ -29,6 +32,42 @@ const schema = makeExecutableSchema({
 
 const app = express();
 app.use(cors("*"));
+//FILE MIDDLEWARE
+
+const uploadDir = "files";
+
+const fileMiddleware = (req, res, next) => {
+  if (!req.is("multipart/form-data")) {
+    return next();
+  }
+
+  const form = formidable.IncomingForm({
+    uploadDir
+  });
+
+  form.parse(req, (error, { operations }, files) => {
+    if (error) {
+      console.log(error);
+    }
+
+    const document = JSON.parse(operations);
+
+    if (Object.keys(files).length) {
+      const {
+        file: { type, path: filePath }
+      } = files;
+      console.log(type);
+      console.log(filePath);
+      document.variables.file = {
+        type,
+        path: filePath
+      };
+    }
+
+    req.body = document;
+    next();
+  });
+};
 
 const addUser = async (req, res, next) => {
   const token = req.headers["x-token"];
@@ -61,6 +100,7 @@ const graphqlEndPoint = "/graphql";
 app.use(
   graphqlEndPoint,
   bodyParser.json(),
+  fileMiddleware,
   graphqlExpress(req => ({
     schema,
     context: {
@@ -80,7 +120,7 @@ app.use(
 );
 const server = createServer(app);
 
-models.sequelize.sync().then(x => {
+models.sequelize.sync({}).then(x => {
   server.listen(8080, () => {
     new SubscriptionServer(
       {
