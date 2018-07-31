@@ -19,20 +19,31 @@ export default {
     createTeam: requiresAuth.createResolver(
       async (parent, args, { models, user }) => {
         try {
-          const response = await models.sequelize.transaction(async () => {
-            const team = await models.Team.create({ ...args });
-            await models.Channel.create({
-              name: "general",
-              public: true,
-              teamId: team.id
-            });
-            await models.Member.create({
-              userId: user.id,
-              admin: true,
-              teamId: team.id
-            });
-            return team;
-          });
+          const response = await models.sequelize.transaction(
+            async transaction => {
+              const team = await models.Team.create(
+                { ...args },
+                { transaction }
+              );
+              await models.Channel.create(
+                {
+                  name: "general",
+                  public: true,
+                  teamId: team.id
+                },
+                { transaction }
+              );
+              await models.Member.create(
+                {
+                  userId: user.id,
+                  admin: true,
+                  teamId: team.id
+                },
+                { transaction }
+              );
+              return team;
+            }
+          );
           return {
             ok: true,
             team: response
