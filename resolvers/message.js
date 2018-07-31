@@ -17,6 +17,8 @@ export default {
     }
   },
   Message: {
+    url: parent =>
+      parent.url ? `http://localhost:8080/${parent.url}` : parent.url,
     user: ({ user, userId }, args, { models }) => {
       if (user) {
         return user;
@@ -45,7 +47,7 @@ export default {
           messageData.url = file.path;
         }
         const message = await models.Message.create({
-          messageData,
+          ...messageData,
           url: messageData.url,
           filetype: messageData.filetype,
           userId: user.id

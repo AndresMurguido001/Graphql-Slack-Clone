@@ -77,7 +77,6 @@ const addUser = async (req, res, next) => {
       req.user = user;
     } catch (err) {
       const refreshToken = req.headers["x-refreshToken"];
-      console.log("TOKEN SHOULD REFRESH ITSELF", refreshToken);
       const newTokens = await refreshTokens(
         token,
         refreshToken,
@@ -85,6 +84,7 @@ const addUser = async (req, res, next) => {
         SECRET,
         SECRET2
       );
+      console.log("NEW TOKENS SHOULD BE HERE: ", newTokens);
       if (newTokens.token && newTokens.refreshToken) {
         res.set("Access-Control-Expose-Headers", "x-token, x-refreshToken");
         res.set("x-token", newTokens.token);
@@ -111,6 +111,7 @@ app.use(
     }
   }))
 );
+app.use("/files", express.static("files"));
 app.use(
   "/graphiql",
   graphiqlExpress({
