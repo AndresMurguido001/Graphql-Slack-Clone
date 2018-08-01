@@ -56,8 +56,6 @@ const fileMiddleware = (req, res, next) => {
       const {
         file: { type, path: filePath }
       } = files;
-      console.log(type);
-      console.log(filePath);
       document.variables.file = {
         type,
         path: filePath
@@ -71,12 +69,13 @@ const fileMiddleware = (req, res, next) => {
 
 const addUser = async (req, res, next) => {
   const token = req.headers["x-token"];
+
   if (token) {
     try {
       const { user } = jwt.verify(token, SECRET);
       req.user = user;
     } catch (err) {
-      const refreshToken = req.headers["x-refreshToken"];
+      const refreshToken = req.headers["x-refreshtoken"];
       const newTokens = await refreshTokens(
         token,
         refreshToken,
@@ -84,7 +83,6 @@ const addUser = async (req, res, next) => {
         SECRET,
         SECRET2
       );
-      console.log("NEW TOKENS SHOULD BE HERE: ", newTokens);
       if (newTokens.token && newTokens.refreshToken) {
         res.set("Access-Control-Expose-Headers", "x-token, x-refreshToken");
         res.set("x-token", newTokens.token);

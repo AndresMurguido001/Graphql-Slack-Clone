@@ -59,6 +59,8 @@ export const refreshTokens = async (
     SECRET,
     refreshSecret
   );
+  console.log("NEW-TOKEN FROM AUTH.JS: ", newToken);
+  console.log("NEW-REFRESH-TOKEN FROM AUTH.JS: ", newRefreshToken);
   return {
     token: newToken,
     refreshToken: newRefreshToken,
