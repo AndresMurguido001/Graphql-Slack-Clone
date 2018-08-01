@@ -6,6 +6,44 @@ export default {
     allChannels: async (parent, args, { models }) => models.Channel.findAll()
   },
   Mutation: {
+    getOrCreateChannel: requiresAuth.createResolver(
+      async (parent, { members, teamId }, { models, user }) => {
+        members.push(user.id);
+        //check if channel exists with members
+        // array_agg(pc.user_id) <- concats into array pc.user_id
+        const [data, result] = await models.sequelize.query(
+          `
+          select c.id 
+          from channels as c, pcmembers pc
+          where pc.channel_id = c.id and c.dm = true and c.public = false and c.team_id = ${teamId}
+          group by c.id 
+          having array_agg(pc.user_id) @> Array[${members.join(
+            ","
+          )}] and count(pc.user_id) = ${members.length}
+        `,
+          { raw: true }
+        );
+        console.log("DATA: ", data, "RESULT: ", result);
+        if (data.length) {
+          return data[0].id;
+        }
+        const channelId = await models.sequelize.transaction(
+          async transaction => {
+            const channel = await models.Channel.create(
+              { name: "HEllo", public: false, dm: true, teamId },
+              {
+                transaction
+              }
+            );
+            const cId = channel.dataValues.id;
+            const pcmembers = members.map(m => ({ userId: m, channelId: cId }));
+            await models.PCMember.bulkCreate(pcmembers, { transaction });
+            return cId;
+          }
+        );
+        return channelId;
+      }
+    ),
     createChannel: requiresAuth.createResolver(
       async (parent, args, { models, user }) => {
         try {
