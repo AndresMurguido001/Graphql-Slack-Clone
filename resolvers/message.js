@@ -28,14 +28,28 @@ export default {
   },
   Query: {
     messages: requiresAuth.createResolver(
-      async (parent, args, { models, user }) =>
-        await models.Message.findAll(
+      async (parent, { channelId }, { models, user }) => {
+        const channel = await models.Channel.findOne({
+          where: { id: channelId },
+          raw: true
+        });
+        if (!channel.public) {
+          const member = await models.PCMember.findOne({
+            raw: true,
+            where: { channelId, userId: user.id }
+          });
+          if (!member) {
+            throw new Error("You are not a member of this private channel");
+          }
+        }
+        return await models.Message.findAll(
           {
             order: [["created_at", "ASC"]],
-            where: { channelId: args.channelId }
+            where: { channelId: channelId }
           },
           { raw: true }
-        )
+        );
+      }
     )
   },
   Mutation: {
