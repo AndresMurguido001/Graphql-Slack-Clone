@@ -1,9 +1,19 @@
 export default (sequelize, DataTypes) => {
-  let Message = sequelize.define("message", {
-    text: DataTypes.STRING,
-    url: DataTypes.STRING,
-    filetype: DataTypes.STRING
-  });
+  let Message = sequelize.define(
+    "message",
+    {
+      text: DataTypes.STRING,
+      url: DataTypes.STRING,
+      filetype: DataTypes.STRING
+    },
+    {
+      indexes: [
+        {
+          fields: ["created_at"]
+        }
+      ]
+    }
+  );
 
   Message.associate = models => {
     //1:M

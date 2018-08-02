@@ -9,6 +9,8 @@ import jwt from "jsonwebtoken";
 import { refreshTokens } from "./auth";
 import models from "./models";
 import formidable from "formidable";
+import Dataloader from "dataloader";
+import { channelBatcher } from "./batchFunctions";
 
 //Subscriptions setup
 import { createServer } from "http";
@@ -105,7 +107,10 @@ app.use(
       models,
       user: req.user,
       SECRET,
-      SECRET2
+      SECRET2,
+      channelLoader: new Dataloader(ids =>
+        channelBatcher(ids, models, req.user)
+      )
     }
   }))
 );

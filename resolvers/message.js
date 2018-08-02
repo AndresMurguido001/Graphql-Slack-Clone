@@ -28,7 +28,7 @@ export default {
   },
   Query: {
     messages: requiresAuth.createResolver(
-      async (parent, { channelId }, { models, user }) => {
+      async (parent, { channelId, cursor }, { models, user }) => {
         const channel = await models.Channel.findOne({
           where: { id: channelId },
           raw: true
@@ -42,13 +42,17 @@ export default {
             throw new Error("You are not a member of this private channel");
           }
         }
-        return await models.Message.findAll(
-          {
-            order: [["created_at", "ASC"]],
-            where: { channelId: channelId }
-          },
-          { raw: true }
-        );
+        const options = {
+          order: [["created_at", "DESC"]],
+          where: { channelId },
+          limit: 35
+        };
+        if (cursor) {
+          options.where.created_at = {
+            [models.op.lt]: cursor
+          };
+        }
+        return await models.Message.findAll(options, { raw: true });
       }
     )
   },

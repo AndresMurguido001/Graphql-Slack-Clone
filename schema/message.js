@@ -13,12 +13,15 @@ export default `
         type: String!
         path: String!
     }
+
     type Subscription {
         newChannelMessage(channelId: Int!): Message!
     }
+
     type Query {
-        messages(channelId: Int!): [Message!]!
+        messages(cursor: String, channelId: Int!): [Message!]!
     }
+
     type Mutation {
         createMessage(channelId: Int!, text: String, file: File): Boolean!
     }

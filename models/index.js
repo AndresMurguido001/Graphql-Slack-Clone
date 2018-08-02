@@ -30,5 +30,6 @@ Object.keys(models).forEach(modelName => {
 
 models.sequelize = sequelize;
 models.Sequelize = Sequelize;
+models.op = Sequelize.Op;
 
 export default models;
