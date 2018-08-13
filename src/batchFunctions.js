@@ -26,6 +26,5 @@ export const channelBatcher = async (ids, models, user) => {
       data[r.team_id] = [r];
     }
   });
-  console.log(data);
   return ids.map(id => data[id]);
 };
