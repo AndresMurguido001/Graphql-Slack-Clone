@@ -23,11 +23,14 @@ const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
 exports.default = {
   Subscription: {
     newChannelMessage: {
-      subscribe: _permissions.requiresTeamAccess.createResolver((0, _graphqlSubscriptions.withFilter)((parent, { channelId }, { models, user }) => _pubsub2.default.asyncIterator(NEW_CHANNEL_MESSAGE), (payload, args) => payload.channelId === args.channelId))
+      subscribe: _permissions.requiresTeamAccess.createResolver((0, _graphqlSubscriptions.withFilter)((parent, { channelId }, { models, user }) => {
+        console.log("SUBSCRIBE WORKING");
+        return _pubsub2.default.asyncIterator(NEW_CHANNEL_MESSAGE);
+      }, (payload, args) => payload.channelId === args.channelId))
     }
   },
   Message: {
-    url: (parent, args, { serverUrl }) => parent.url ? `${serverUrl}/${parent.url}` : parent.url,
+    url: parent => parent.url ? `${process.env.SERVER_URL || "http://localhost:8080"}/${parent.url}` : parent.url,
     user: ({ user, userId }, args, { models }) => {
       if (user) {
         return user;

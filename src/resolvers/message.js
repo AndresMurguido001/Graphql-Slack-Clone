@@ -9,16 +9,20 @@ export default {
     newChannelMessage: {
       subscribe: requiresTeamAccess.createResolver(
         withFilter(
-          (parent, { channelId }, { models, user }) =>
-            pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
+          (parent, { channelId }, { models, user }) => {
+            console.log("SUBSCRIBE WORKING");
+            return pubsub.asyncIterator(NEW_CHANNEL_MESSAGE);
+          },
           (payload, args) => payload.channelId === args.channelId
         )
       )
     }
   },
   Message: {
-    url: (parent, args, { serverUrl }) =>
-      parent.url ? `${serverUrl}/${parent.url}` : parent.url,
+    url: parent =>
+      parent.url
+        ? `${ process.env.SERVER_URL || "http://localhost:8080"}/${parent.url}`
+        : parent.url,
     user: ({ user, userId }, args, { models }) => {
       if (user) {
         return user;
